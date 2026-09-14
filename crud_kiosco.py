@@ -13,7 +13,7 @@ if not os.path.exists(DB_NAME):
         DB_NAME = posible_padre
 
 
-def insertar_producto(nombre: str, precio: float, stock_actual: int, stock_minimo: int):
+def insertar_producto(nombre: str, precio: float, stock_actual: float, stock_minimo: float, es_pesable: int = 0):
     """
     Inserta un nuevo producto en la tabla Producto.
     Maneja excepciones en caso de error y asegura el cierre de la conexión con with.
@@ -22,10 +22,10 @@ def insertar_producto(nombre: str, precio: float, stock_actual: int, stock_minim
         with sqlite3.connect(DB_NAME) as conexion:
             cursor = conexion.cursor()
             query = """
-                INSERT INTO Producto (Nombre_Descripcion, Precio_Venta, Stock_Actual, Stock_Minimo)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO Producto (Nombre_Descripcion, Precio_Venta, Stock_Actual, Stock_Minimo, Es_Pesable)
+                VALUES (?, ?, ?, ?, ?)
             """
-            cursor.execute(query, (nombre, precio, stock_actual, stock_minimo))
+            cursor.execute(query, (nombre, precio, stock_actual, stock_minimo, es_pesable))
             nuevo_id = cursor.lastrowid
             print(f"[+] Producto '{nombre}' insertado exitosamente con ID {nuevo_id}.")
             return nuevo_id
@@ -38,13 +38,13 @@ def buscar_producto(nombre_parcial: str) -> list:
     """
     Ejecuta una consulta con LIKE para buscar productos que contengan nombre_parcial
     en su descripción y devuelve una lista de tuplas con los resultados:
-    (ID, Nombre, Precio, Stock).
+    (ID, Nombre, Precio, Stock, Es_Pesable).
     """
     try:
         with sqlite3.connect(DB_NAME) as conexion:
             cursor = conexion.cursor()
             query = """
-                SELECT ID_Producto, Nombre_Descripcion, Precio_Venta, Stock_Actual
+                SELECT ID_Producto, Nombre_Descripcion, Precio_Venta, Stock_Actual, Es_Pesable
                 FROM Producto
                 WHERE Nombre_Descripcion LIKE ?
             """
@@ -86,14 +86,15 @@ if __name__ == "__main__":
 
     # Demostración / pruebas
     print("--- 1. Insertando productos ---")
-    id1 = insertar_producto("Alfajor Havanna Chocolate", 1200.0, 50, 10)
-    id2 = insertar_producto("Gaseosa Coca-Cola 500ml", 1500.0, 30, 5)
-    id3 = insertar_producto("Alfajor Jorgito Blanco", 600.0, 40, 10)
+    id1 = insertar_producto("Alfajor Havanna Chocolate", 1200.0, 50, 10, 0)
+    id2 = insertar_producto("Gaseosa Coca-Cola 500ml", 1500.0, 30, 5, 0)
+    id3 = insertar_producto("Alfajor Jorgito Blanco", 600.0, 40, 10, 0)
+    id4 = insertar_producto("Manzanas Criollas", 950.0, 20.5, 5.0, 1)
 
     print("\n--- 2. Buscando productos con 'Alfajor' ---")
     encontrados = buscar_producto("Alfajor")
     for prod in encontrados:
-        print(f"ID: {prod[0]} | Nombre: {prod[1]} | Precio: ${prod[2]} | Stock: {prod[3]}")
+        print(f"ID: {prod[0]} | Nombre: {prod[1]} | Precio: ${prod[2]} | Stock: {prod[3]} | Pesable: {prod[4]}")
 
     print("\n--- 3. Actualizando precio ---")
     if id1:
@@ -102,4 +103,4 @@ if __name__ == "__main__":
     print("\n--- 4. Verificando producto actualizado ---")
     encontrados = buscar_producto("Havanna")
     for prod in encontrados:
-        print(f"ID: {prod[0]} | Nombre: {prod[1]} | Precio: ${prod[2]} | Stock: {prod[3]}")
+        print(f"ID: {prod[0]} | Nombre: {prod[1]} | Precio: ${prod[2]} | Stock: {prod[3]} | Pesable: {prod[4]}")

@@ -9,8 +9,9 @@ TABLAS = {
             ID_Producto INTEGER PRIMARY KEY AUTOINCREMENT,
             Nombre_Descripcion TEXT NOT NULL,
             Precio_Venta REAL NOT NULL,
-            Stock_Actual INTEGER DEFAULT 0,
-            Stock_Minimo INTEGER DEFAULT 0
+            Stock_Actual REAL DEFAULT 0,
+            Stock_Minimo REAL DEFAULT 0,
+            Es_Pesable INTEGER DEFAULT 0
         );
     """,
     "Cliente": """
@@ -35,7 +36,7 @@ TABLAS = {
             ID_Detalle INTEGER PRIMARY KEY AUTOINCREMENT,
             ID_Venta INTEGER NOT NULL,
             ID_Producto INTEGER NOT NULL,
-            Cantidad INTEGER NOT NULL,
+            Cantidad REAL NOT NULL,
             Precio_Historico REAL NOT NULL,
             Subtotal REAL NOT NULL,
             FOREIGN KEY (ID_Venta) REFERENCES Venta(ID_Venta),
